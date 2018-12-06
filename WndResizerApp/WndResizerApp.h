@@ -21,7 +21,7 @@ public:
 	CWndResizerApp();
 
 // Overrides
-	public:
+public:
 	virtual BOOL InitInstance();
 
 // Implementation

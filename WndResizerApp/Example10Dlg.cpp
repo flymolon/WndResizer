@@ -14,10 +14,11 @@
 
 IMPLEMENT_DYNAMIC(CExample10Dlg, CDialog)
 
-CExample10Dlg::CExample10Dlg(CWnd* pParent /*=NULL*/)
+	CExample10Dlg::CExample10Dlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CExample10Dlg::IDD, pParent)
 {
-  m_pView = NULL;
+	m_pView = NULL;
+	m_resizer = NULL;
 }
 
 CExample10Dlg::~CExample10Dlg()
@@ -32,81 +33,85 @@ void CExample10Dlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CExample10Dlg, CDialog)
-  ON_WM_DESTROY()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 BOOL CExample10Dlg::OnInitDialog()
 {
-  CDialog::OnInitDialog();
+	CDialog::OnInitDialog();
 
-  m_pView = CreateFormViewOnTheFly();
-  ASSERT( m_pView != NULL );
+	m_pView = CreateFormViewOnTheFly();
+	ASSERT( m_pView != NULL );
+	m_resizer = new CWndResizer();
 
-  m_pView->SetDlgCtrlID(EMBEDED_VIEW_ID);
+	m_pView->SetDlgCtrlID(EMBEDED_VIEW_ID);
 
-  BOOL bOk = m_resizer.Hook(this);
-  ASSERT ( bOk );
+	BOOL bOk = m_resizer->Hook(this);
+	ASSERT ( bOk );
 
-  bOk = m_resizer.SetAnchor(EMBEDED_VIEW_ID, ANCHOR_ALL);
-  ASSERT( bOk );
+	bOk = m_resizer->SetAnchor(EMBEDED_VIEW_ID, ANCHOR_ALL);
+	ASSERT( bOk );
 
-  bOk = m_resizer.SetAnchor(IDOK, ANCHOR_RIGHT | ANCHOR_BOTTOM);
-  ASSERT(bOk );
+	bOk = m_resizer->SetAnchor(IDOK, ANCHOR_RIGHT | ANCHOR_BOTTOM);
+	ASSERT(bOk );
 
-  bOk = m_resizer.SetAnchor(IDCANCEL, ANCHOR_RIGHT | ANCHOR_BOTTOM);
-  ASSERT(bOk );
+	bOk = m_resizer->SetAnchor(IDCANCEL, ANCHOR_RIGHT | ANCHOR_BOTTOM);
+	ASSERT(bOk );
 
-  m_resizer.SetShowResizeGrip(TRUE);
+	m_resizer->SetShowResizeGrip(TRUE);
 
-  bOk = m_resizer.InvokeOnResized();
-  ASSERT(bOk );
+	bOk = m_resizer->InvokeOnResized();
+	ASSERT(bOk );
 
-  return TRUE;  // return TRUE unless you set the focus to a control
-  // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 
 
 CFormView * CExample10Dlg::CreateFormViewOnTheFly()
 {
-  CCreateContext  ctx;
-  // memebers we do not use, so set them to null
-  ctx.m_pNewViewClass = RUNTIME_CLASS(CTestView);
-  ctx.m_pNewDocTemplate = NULL;
-  ctx.m_pLastView = NULL;
-  ctx.m_pCurrentFrame = NULL;
+	CCreateContext  ctx;
+	// memebers we do not use, so set them to null
+	ctx.m_pNewViewClass = RUNTIME_CLASS(CTestView);
+	ctx.m_pNewDocTemplate = NULL;
+	ctx.m_pLastView = NULL;
+	ctx.m_pCurrentFrame = NULL;
 
-  CFrameWnd * pFrameWnd = (CFrameWnd*) this;
-  CFormView * pView = (CFormView *) pFrameWnd->CreateView(&ctx);
-  if (pView->GetSafeHwnd() == NULL )
-  {
-    AfxMessageBox(_T("Failed to create view."));
-    pView = NULL;
-    return NULL;
-  }
-  // After a view is created, resize that to
-  // have the same size as the dialog.
-  
-  CRect rc(0, 0, 0, 0);
-  GetDlgItem(IDC_STATIC_MARKER)->GetWindowRect(&rc);
-  ScreenToClient( &rc );
-  pView->MoveWindow(rc);
+	CFrameWnd * pFrameWnd = (CFrameWnd*) this;
+	CFormView * pView = (CFormView *) pFrameWnd->CreateView(&ctx);
+	if (pView->GetSafeHwnd() == NULL )
+	{
+		AfxMessageBox(_T("Failed to create view."));
+		pView = NULL;
+		return NULL;
+	}
+	// After a view is created, resize that to
+	// have the same size as the dialog.
 
-  pView->OnInitialUpdate();
-  pView->ShowWindow(SW_NORMAL);
+	CRect rc(0, 0, 0, 0);
+	GetDlgItem(IDC_STATIC_MARKER)->GetWindowRect(&rc);
+	ScreenToClient( &rc );
+	pView->MoveWindow(rc);
 
-  return pView;
+	pView->OnInitialUpdate();
+	pView->ShowWindow(SW_NORMAL);
+
+	return pView;
 }
 
 void CExample10Dlg::OnDestroy()
 {
-  CDialog::OnDestroy();
+	CDialog::OnDestroy();
 
-  if (m_pView != NULL )
-  {
-    delete m_pView;
-    m_pView = NULL;
-  }}
+
+	if (m_pView != NULL) {
+		m_pView->DestroyWindow();
+		m_pView = NULL;
+	}
+
+	delete m_resizer;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -114,10 +119,10 @@ void CExample10Dlg::OnDestroy()
 ////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNCREATE(CTestView, CFormView)
 
-CTestView::CTestView()
+	CTestView::CTestView()
 	: CFormView(CTestView::IDD)
 {
-  m_szDesignTimeSize.SetSize(0,0);
+	m_szDesignTimeSize.SetSize(0,0);
 }
 
 CTestView::~CTestView()
@@ -130,7 +135,7 @@ void CTestView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CTestView, CFormView)
-  ON_WM_CREATE()
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 
@@ -157,42 +162,42 @@ void CTestView::Dump(CDumpContext& dc) const
 
 void CTestView::OnInitialUpdate()
 {
-  CFormView::OnInitialUpdate();
-  SetupResizer();
+	CFormView::OnInitialUpdate();
+	SetupResizer();
 
 
 }
 void CTestView::SetupResizer()
 {
-  BOOL bOk = m_resizer.Hook(this, m_szDesignTimeSize);
-  ASSERT( bOk );
+	BOOL bOk = m_resizer.Hook(this, m_szDesignTimeSize);
+	ASSERT( bOk );
 
-  bOk = m_resizer.SetAnchor(IDC_EDIT1, ANCHOR_HORIZONTALLY);
-  ASSERT( bOk );
+	bOk = m_resizer.SetAnchor(IDC_EDIT1, ANCHOR_HORIZONTALLY);
+	ASSERT( bOk );
 
-  bOk = m_resizer.SetAnchor(IDC_BUTTON1, ANCHOR_RIGHT);
-  ASSERT( bOk );
+	bOk = m_resizer.SetAnchor(IDC_BUTTON1, ANCHOR_RIGHT);
+	ASSERT( bOk );
 
-  bOk = m_resizer.SetAnchor(IDC_EDIT2, ANCHOR_ALL);
-  ASSERT( bOk );
+	bOk = m_resizer.SetAnchor(IDC_EDIT2, ANCHOR_ALL);
+	ASSERT( bOk );
 
-  bOk = m_resizer.SetAnchor(IDC_BUTTON2, ANCHOR_RIGHT | ANCHOR_BOTTOM);
-  ASSERT( bOk );
+	bOk = m_resizer.SetAnchor(IDC_BUTTON2, ANCHOR_RIGHT | ANCHOR_BOTTOM);
+	ASSERT( bOk );
 
-  bOk = m_resizer.InvokeOnResized();
-  ASSERT( bOk );
+	bOk = m_resizer.InvokeOnResized();
+	ASSERT( bOk );
 
-  CString sDebug = m_resizer.GetDebugInfo();
+	CString sDebug = m_resizer.GetDebugInfo();
 }
 
 
 
 int CTestView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-  if (CFormView::OnCreate(lpCreateStruct) == -1)
-    return -1;
+	if (CFormView::OnCreate(lpCreateStruct) == -1)
+		return -1;
 
-  m_szDesignTimeSize.SetSize(lpCreateStruct->cx, lpCreateStruct->cy);
+	m_szDesignTimeSize.SetSize(lpCreateStruct->cx, lpCreateStruct->cy);
 
-  return 0;
+	return 0;
 }

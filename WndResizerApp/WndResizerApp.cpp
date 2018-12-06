@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "WndResizerApp.h"
+#include "WndResizerDlg.h"
 #include "SwitchBoardDlg.h"
 
 #ifdef _DEBUG
@@ -48,6 +49,14 @@ BOOL CWndResizerApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+
+	// Create the shell manager, in case the dialog contains
+	// any shell tree view or shell list view controls.
+	CShellManager *pShellManager = new CShellManager;
+
+	// Activate "Windows Native" visual manager for enabling themes in MFC controls
+	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
+
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size
 	// of your final executable, you should remove from the following
@@ -57,7 +66,7 @@ BOOL CWndResizerApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	CSwitchBoardDlg dlg;
+	/*CWndResizerDlg*/CSwitchBoardDlg  dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
@@ -70,8 +79,20 @@ BOOL CWndResizerApp::InitInstance()
 		// TODO: Place code here to handle when the dialog is
 		//  dismissed with Cancel
 	}
+	else if (nResponse == -1)
+	{
+		TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
+		TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
+	}
+
+	// Delete the shell manager created above.
+	if (pShellManager != NULL)
+	{
+		delete pShellManager;
+	}
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
 	return FALSE;
 }
+

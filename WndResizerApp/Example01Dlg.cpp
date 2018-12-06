@@ -27,6 +27,7 @@ void CExample01Dlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CExample01Dlg, CDialog)
+
 END_MESSAGE_MAP()
 
 
@@ -75,3 +76,5 @@ BOOL CExample01Dlg::OnInitDialog()
   return TRUE;  // return TRUE unless you set the focus to a control
   // EXCEPTION: OCX Property Pages should return FALSE
 }
+
+

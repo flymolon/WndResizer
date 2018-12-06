@@ -11,7 +11,7 @@
 IMPLEMENT_DYNAMIC(CTestDlg, CDialog)
 
 CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CTestDlg::IDD, pParent)
+    : CDialog(CTestDlg::IDD, pParent)
 {
 
 }
@@ -22,11 +22,12 @@ CTestDlg::~CTestDlg()
 
 void CTestDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+    CDialog::DoDataExchange(pDX);
 }
 
 
 BEGIN_MESSAGE_MAP(CTestDlg, CDialog)
+    ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -42,40 +43,7 @@ BOOL CTestDlg::OnInitDialog()
   bOk = m_resizer.Hook(this);
   ASSERT( bOk);
 
-
-  //bOk = m_resizer.SetAnchor(IDC_Group, ANCHOR_ALL); // group box
-  //ASSERT( bOk);
-
-  CUIntArray arr;
-  arr.Add(IDC_BUTTON3);
-  arr.Add(IDC_BUTTON2);
-  arr.Add(IDC_BUTTON1);
-  arr.Add(IDC_BUTTON4);
-  arr.Add(IDC_STATIC);
-
-  bOk = m_resizer.CreatePanel(_T("MyFlow"), &arr, TRUE);
-   ASSERT( bOk );
-
-  bOk = m_resizer.SetAnchor(_T("MyFlow"), ANCHOR_ALL);
-   ASSERT( bOk );
-
-  bOk = m_resizer.SetDock(IDC_BUTTON1, DOCK_TOP);
-   ASSERT( bOk );
-  bOk = m_resizer.SetDock(IDC_BUTTON2, DOCK_RIGHT);
-   ASSERT( bOk );
-  bOk = m_resizer.SetDock(IDC_BUTTON3, DOCK_BOTTOM);
-   ASSERT( bOk );
-  bOk = m_resizer.SetDock(IDC_BUTTON4, DOCK_LEFT);
-   ASSERT( bOk );
-  bOk = m_resizer.SetDock(IDC_STATIC, DOCK_FILL);
-   ASSERT( bOk );
-
-
-  bOk = m_resizer.SetAnchor(IDOK, ANCHOR_RIGHT | ANCHOR_BOTTOM);
-  ASSERT( bOk);
-
-  bOk = m_resizer.SetAnchor(IDCANCEL, ANCHOR_RIGHT | ANCHOR_BOTTOM);
-  ASSERT( bOk);
+  m_resizer.SetAutoHandlePaint(FALSE);
 
   m_resizer.SetShowResizeGrip(TRUE);
 
@@ -84,4 +52,17 @@ BOOL CTestDlg::OnInitDialog()
 
   return TRUE;  // return TRUE unless you set the focus to a control
   // EXCEPTION: OCX Property Pages should return FALSE
+}
+
+
+void CTestDlg::OnPaint()
+{
+	TRACE("CTestDlg::OnPaint()\n");
+    CPaintDC dc(this); // device context for painting
+
+    CRect rect(10, 20, 60, 60);
+    CBrush brush(RGB(0,0,0));
+    dc.FillRect(rect, &brush);
+	m_resizer.Draw(&dc);
+
 }

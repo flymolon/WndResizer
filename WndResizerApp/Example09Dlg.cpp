@@ -98,12 +98,12 @@ BOOL CExample09Dlg::CreatePropertySheetOnTheFly()
   m_pSheet->AddPage( m_pPageB );
 
 	//// create a modeless property page
-	if (m_pSheet->Create(this, DS_CONTEXTHELP | DS_SETFONT | WS_CHILD | WS_VISIBLE))
+	if (m_pSheet->Create(this, DS_CONTEXTHELP | DS_SETFONT | WS_CHILD | WS_VISIBLE | DS_CONTROL))
 	{
     CRect rc;
     GetDlgItem(IDC_STATIC_A)->GetWindowRect(&rc);
     ScreenToClient(&rc);
-
+    m_pSheet->ModifyStyleEx(NULL, WS_EX_CONTROLPARENT);
     m_pSheet->MoveWindow(&rc);
 
 

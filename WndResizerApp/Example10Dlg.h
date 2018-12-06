@@ -15,7 +15,7 @@ public:
 	enum { IDD = IDD_EX10_DLG };
 
 private:
-  CWndResizer m_resizer;
+  CWndResizer * m_resizer;
   CFormView * m_pView;
 private:
   CFormView * CreateFormViewOnTheFly();
